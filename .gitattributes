@@ -1,0 +1,5 @@
+* text=auto
+
+# Normalise endings to CRLF
+*.ps1             eol=crlf
+*.psm1            eol=crlf
