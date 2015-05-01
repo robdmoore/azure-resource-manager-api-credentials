@@ -95,6 +95,7 @@ function Set-ARMServicePrincipalCredential {
         ClientId = "";
         TenantId = "";
         Password = "";
+        AzureADAppName = "";
     };
 
     if ($AppName) {
@@ -102,8 +103,11 @@ function Set-ARMServicePrincipalCredential {
     }
 
     if ($ResourceGroupName) {
+        $result.ResourceGroupName = $ResourceGroupName
         $AzureADAppName = "$ResourceGroupName-ApiManagement";
     }
+    
+    $result.AzureADAppName = $AzureADAppName
 
     $ErrorActionPreference = "Stop"
 
@@ -130,13 +134,13 @@ function Set-ARMServicePrincipalCredential {
         Connect-AzureAD -DomainName $AzureTenantId
         $ADApp = Get-OrCreateAzureADApp -AppName $AzureADAppName
     }
-    Write-Verbose "Client Id:" $ADApp.appId
+    Write-Verbose "Client Id: $($ADApp.appId)"
     $result.ClientId = $ADApp.appId
 
     Write-Verbose "Creating a password to authenticate as the Azure AD app"
     $ServicePrincipalPassword = Get-GeneratedPassword
     Add-AzureADApplicationCredential -ObjectId $ADApp.objectId -Password $ServicePrincipalPassword | Out-Null
-    Write-Verbose "Password:" $ServicePrincipalPassword
+    Write-Verbose "Password: $ServicePrincipalPassword"
     $result.Password = $ServicePrincipalPassword
 
     Write-Verbose "Idempotently creating the resource group"
